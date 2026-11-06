@@ -6,14 +6,12 @@ import {
   initialState,
   managerCost,
   maxAffordable,
-  resolveCase,
   rollLoot,
   trackCost,
 } from './src/game/engine.js';
 import { formatNumber, formatMoney } from './src/game/format.js';
 import {
   BUSINESSES,
-  CASES,
   EVENTS,
   LOOT_CASES,
   LUXURY,
@@ -153,42 +151,6 @@ const tax = applyEventChoice(
   1700000000000
 );
 assert(near(tax.money, 950), 'cash percent effect');
-
-// ── Кейсы ─────────────────────────────────────────────────────────
-const caseState = { ...initialState(), money: 1000000 };
-const franchise = CASES.find((c) => c.id === 'case-franchise');
-assert(franchise, 'franchise case exists');
-const nextCase = resolveCase(caseState, franchise.choices[0], computeDerived(caseState));
-assert(nextCase.businesses.shawarma === 2, 'case addBusiness adds units');
-assert(near(nextCase.money, 1000000 - 45000), 'case cost deducted');
-assert(nextCase.casesResolved === 1, 'case resolved counted');
-
-const maCase = CASES.find((c) => c.id === 'case-ma');
-const maNext = resolveCase({ ...initialState(), money: 100 }, maCase.choices[0], computeDerived({ ...initialState(), money: 100 }));
-assert(maNext.money > 100, 'case cashAmount reward');
-
-const crisisCase = CASES.find((c) => c.id === 'case-crisis');
-const crisisNext = resolveCase(
-  { ...initialState(), money: 100000000 },
-  crisisCase.choices[0],
-  computeDerived({ ...initialState(), money: 100000000 })
-);
-assert(near(computeDerived(crisisNext).effectMult, 1.35), 'case invest effect');
-
-for (const c of CASES) {
-  assert(c.id.startsWith('case-'), 'case id prefix ' + c.id);
-  for (const ch of c.choices) {
-    for (const e of ch.effects || []) {
-      assert(
-        ['incomeMult', 'cash', 'cashAmount', 'cashPct', 'invest', 'addBusiness'].includes(e.kind),
-        'case effect kind ' + e.kind
-      );
-      if (e.kind === 'addBusiness') {
-        assert(BUSINESSES.some((b) => b.id === e.id), 'case addBusiness ref ' + e.id);
-      }
-    }
-  }
-}
 
 // ── Лут-кейсы ─────────────────────────────────────────────────────
 assert(LOOT_CASES.length >= 2, 'loot cases exist');

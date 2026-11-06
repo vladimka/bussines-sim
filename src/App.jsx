@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ACHIEVEMENTS,
   BUSINESSES,
-  CASES,
   EVENTS,
   LOOT_CASES,
   LUXURY,
@@ -21,7 +20,6 @@ import {
   isReqMet,
   managerCost,
   maxAffordable,
-  resolveCase,
   rollLoot,
   trackCost,
 } from './game/engine.js';
@@ -395,10 +393,6 @@ export default function App() {
     );
   };
 
-  const chooseCase = (choice) => {
-    setState((s) => resolveCase(s, choice, derivedRef.current));
-  };
-
   const openLootCase = (caseId) => {
     const loot = LOOT_CASES.find((l) => l.id === caseId);
     if (!loot || state.money < loot.cost) return null;
@@ -662,10 +656,8 @@ export default function App() {
 
           {tab === 'cases' && (
             <CasesTab
-              cases={CASES}
               lootCases={LOOT_CASES}
               money={state.money}
-              onChoose={chooseCase}
               onOpenLoot={openLootCase}
             />
           )}
